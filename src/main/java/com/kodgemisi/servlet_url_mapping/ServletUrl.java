@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * i.e {@code servletUrlPattern.register(...)} this method parses url patterns into {@code ServletUrl}s and stores them in an array internally.
  * </p>
  *
+ * @author destan
  * @see ServletUrlPattern#parse(javax.servlet.http.HttpServletRequest)
  * @see ServletUrlPattern#register(String, String, Class[])
  */
@@ -81,9 +82,9 @@ public class ServletUrl {
 	}
 
 	/**
-	 * <strong>Caveat</strong>
-	 * <p>Prefer primitive wrapper classes like Integer, Long etc. to avoid {@link NullPointerException} when the value is null.</p>
-	 * <p>Note that casting {@code null} to {@code int} throws {@link NullPointerException} however casting {@code null} to {@link Integer} doesn't!</p>
+	 * <strong>Caveat</strong> <p>Prefer primitive wrapper classes like Integer, Long etc. to avoid {@link NullPointerException} when the value is
+	 * null.</p> <p>Note that casting {@code null} to {@code int} throws {@link NullPointerException} however casting {@code null} to {@link Integer}
+	 * doesn't!</p>
 	 *
 	 * @param variable
 	 * @param <T>
