@@ -1,3 +1,9 @@
+/* © 2017 Kod Gemisi Ltd.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.kodgemisi.servlet_url_mapping;
 
 import javax.servlet.ServletException;
@@ -14,39 +20,39 @@ import java.io.IOException;
  * {@code @WebServlet(urlPatterns = {"/products", "/products/*"})}
  * public class MyServlet extends MappingServlet {
  *   public MyServlet() {
- *       this.patternRegistrar = new ServletUrlPatternRegistrar()
- *
+ *       this.patternRegistrar =
+ * <p>
  *              // matches GET request to "host/context-root/products"
  *              .get("list", "/", this::list)
- *
+ * <p>
  *              // matches GET request to "host/context-root/products/all"
- *              .get("list", "/all", this::list) // note that the same method can be used for multiple url mappings
- *
+ *              .get("all", "/all", this::list) // note that the same method can be used for multiple url mappings
+ * <p>
  *              // matches GET request to "host/context-root/products/{id}"
  *              .get("show", "/{id}", this::show)
- *
+ * <p>
  *              // matches POST request to "host/context-root/products"
  *              .post("create", "/", this::create)
- *
+ * <p>
  *              // matches POST request to "host/context-root/products/{id}/address"
  *              .post("add address", "/{id}/address", this::addAddress);
  *       // and so on...
  *   }
- *
+ * <p>
  *   // any access modifier can be used
  *   private void list(HttpServletRequest request, HttpServletResponse response, ServletUrl servletUrl) throws ServletException, IOException {
  *       // your code...
  *   }
- *
+ * <p>
  *   private void show(HttpServletRequest request, HttpServletResponse response, ServletUrl servletUrl) throws ServletException, IOException {
  *       Integer id = servletUrl.variable("id"); // this is parsed from url: /{id}
  *       // your code...
  *   }
- *
+ * <p>
  *   // and rest of your methods...
  * }
  * </pre></blockquote>
- *
+ * <p>
  * <p>When a request matching your registered HTTP method and url pattern comes your given method will be invoked automatically.</p>
  *
  * @author destan
@@ -67,18 +73,8 @@ public class ServletUrlPatternRegistrar {
 
 	private final ServletUrlPattern TRACE = new ServletUrlPattern();
 
-	public ServletUrlPatternRegistrar get(String name, String urlPattern, Class<?>... type) {
-		GET.register(name, urlPattern, type);
-		return this;
-	}
-
 	public ServletUrlPatternRegistrar get(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		GET.register(name, urlPattern, requestHandler, type);
-		return this;
-	}
-
-	public ServletUrlPatternRegistrar post(String name, String urlPattern, Class<?>... type) {
-		POST.register(name, urlPattern, type);
 		return this;
 	}
 
@@ -87,18 +83,8 @@ public class ServletUrlPatternRegistrar {
 		return this;
 	}
 
-	public ServletUrlPatternRegistrar put(String name, String urlPattern, Class<?>... type) {
-		PUT.register(name, urlPattern, type);
-		return this;
-	}
-
 	public ServletUrlPatternRegistrar put(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		PUT.register(name, urlPattern, requestHandler, type);
-		return this;
-	}
-
-	public ServletUrlPatternRegistrar delete(String name, String urlPattern, Class<?>... type) {
-		DELETE.register(name, urlPattern, type);
 		return this;
 	}
 
@@ -107,18 +93,8 @@ public class ServletUrlPatternRegistrar {
 		return this;
 	}
 
-	public ServletUrlPatternRegistrar head(String name, String urlPattern, Class<?>... type) {
-		HEAD.register(name, urlPattern, type);
-		return this;
-	}
-
 	public ServletUrlPatternRegistrar head(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		HEAD.register(name, urlPattern, requestHandler, type);
-		return this;
-	}
-
-	public ServletUrlPatternRegistrar options(String name, String urlPattern, Class<?>... type) {
-		OPTIONS.register(name, urlPattern, type);
 		return this;
 	}
 
@@ -127,16 +103,18 @@ public class ServletUrlPatternRegistrar {
 		return this;
 	}
 
-	public ServletUrlPatternRegistrar trace(String name, String urlPattern, Class<?>... type) {
-		TRACE.register(name, urlPattern, type);
-		return this;
-	}
-
 	public ServletUrlPatternRegistrar treace(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		TRACE.register(name, urlPattern, requestHandler, type);
 		return this;
 	}
 
+	/**
+	 * Only parses the url and returns a {@link com.kodgemisi.servlet_url_mapping.ServletUrl} object representing matched url mapping. This method
+	 * doesn't invoke the {@code requestHandler} even there is a match.
+	 *
+	 * @param request
+	 * @return a {@link com.kodgemisi.servlet_url_mapping.ServletUrl} object representing matched url mapping.
+	 */
 	public ServletUrl parse(HttpServletRequest request) {
 		switch (request.getMethod().toLowerCase()) {
 		case "get":
@@ -159,14 +137,13 @@ public class ServletUrlPatternRegistrar {
 	}
 
 	/**
-	 * <p>Normally you are not supposed to used this method.</p>
+	 * <p><strong>You are not supposed to use this method</strong> when your servlet extends {@link com.kodgemisi.servlet_url_mapping.MappingServlet}.</p>
 	 *
 	 * <p>If the request matches one of your registered HTTP method and url pattern then corresponding method will be invoked automatically.</p>
 	 *
 	 * @param request
 	 * @param response
-	 * @return
-	 *
+	 * @return a {@link com.kodgemisi.servlet_url_mapping.ServletUrl} object representing matched url mapping.
 	 * @throws ServletException
 	 * @throws IOException
 	 */
