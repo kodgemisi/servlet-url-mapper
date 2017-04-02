@@ -31,7 +31,7 @@ public class ServletUrl {
 
 	static final ServletUrl notFound;
 
-	private static Pattern pathVariablePattern = Pattern.compile("\\{[A-Za-z_$]\\w+\\}");
+	private static Pattern pathVariablePattern = Pattern.compile("\\{[A-Za-z_$]\\w*\\}");
 
 	static {
 		notFound = new ServletUrl(NOT_FOUND_404, "<not applicable>", new Class[0]);
