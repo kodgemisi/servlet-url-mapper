@@ -78,8 +78,18 @@ public class ServletUrlPatternRegistrar {
 		return this;
 	}
 
+	public ServletUrlPatternRegistrar get(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		GET.register(urlPattern, requestHandler, type);
+		return this;
+	}
+
 	public ServletUrlPatternRegistrar post(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		POST.register(name, urlPattern, requestHandler, type);
+		return this;
+	}
+
+	public ServletUrlPatternRegistrar post(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		POST.register(urlPattern, requestHandler, type);
 		return this;
 	}
 
@@ -88,8 +98,18 @@ public class ServletUrlPatternRegistrar {
 		return this;
 	}
 
+	public ServletUrlPatternRegistrar put(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		PUT.register(urlPattern, requestHandler, type);
+		return this;
+	}
+
 	public ServletUrlPatternRegistrar delete(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		DELETE.register(name, urlPattern, requestHandler, type);
+		return this;
+	}
+
+	public ServletUrlPatternRegistrar delete(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		DELETE.register(urlPattern, requestHandler, type);
 		return this;
 	}
 
@@ -98,13 +118,28 @@ public class ServletUrlPatternRegistrar {
 		return this;
 	}
 
+	public ServletUrlPatternRegistrar head(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		HEAD.register(urlPattern, requestHandler, type);
+		return this;
+	}
+
 	public ServletUrlPatternRegistrar options(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		OPTIONS.register(name, urlPattern, requestHandler, type);
 		return this;
 	}
 
-	public ServletUrlPatternRegistrar treace(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+	public ServletUrlPatternRegistrar options(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		OPTIONS.register(urlPattern, requestHandler, type);
+		return this;
+	}
+
+	public ServletUrlPatternRegistrar trace(String name, String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
 		TRACE.register(name, urlPattern, requestHandler, type);
+		return this;
+	}
+
+	public ServletUrlPatternRegistrar trace(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		TRACE.register(urlPattern, requestHandler, type);
 		return this;
 	}
 

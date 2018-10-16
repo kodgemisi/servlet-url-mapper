@@ -29,12 +29,12 @@ public class ServletUrl {
 
 	public static final String NOT_FOUND_404 = "404_NOT_FOUND";
 
-	static final ServletUrl notFound;
+	static final ServletUrl NOT_FOUND;
 
 	private static Pattern pathVariablePattern = Pattern.compile("\\{[A-Za-z_$]\\w*\\}");
 
 	static {
-		notFound = new ServletUrl(NOT_FOUND_404, "<not applicable>", new Class[0]);
+		NOT_FOUND = new ServletUrl(NOT_FOUND_404, "<not applicable>", new Class[0]);
 	}
 
 	private final String name;
@@ -47,10 +47,16 @@ public class ServletUrl {
 
 	private final boolean hasTrailingSlash;
 
-	private Map<String, Object> pathVariables;
+	private final Map<String, Object> pathVariables;
 
 	private int index = 0;
 
+	/**
+	 *
+	 * @param name May be null or empty
+	 * @param urlPattern
+	 * @param types
+	 */
 	ServletUrl(String name, String urlPattern, Class<?>[] types) {
 		this.name = name;
 		this.variableTypes = Collections.unmodifiableList(Arrays.asList(types));

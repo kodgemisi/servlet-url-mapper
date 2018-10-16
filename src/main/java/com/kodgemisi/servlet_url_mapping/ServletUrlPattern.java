@@ -18,8 +18,60 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
- * <p>If you are in a Servlet please prefer {@link ServletUrlPatternRegistrar} instead of this class because this class is low level.</p>
- * <p>Intended to be used one instance per filter (or servlet).</p>
+ * <p>If you are in a Servlet please prefer {@link ServletUrlPatternRegistrar} instead of this class because this is a low level API.</p>
+ *
+ * <p>However you can go manuel and instead of using {@link MappingServlet} and {@link ServletUrlPatternRegistrar} you can use {@link
+ * com.kodgemisi.servlet_url_mapping.ServletUrlPattern} directly to register url patterns.</p>
+ *
+ * <p>When you register url patterns <strong>with</strong> a {@code requestHandler} then you need to use
+ * {@link #handle(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)} as follows:</p>
+ *
+ * <blockquote><pre>
+ * void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+ *      // Note that it's "ServletUrlPattern" and not "ServletUrlPatternRegistrar"
+ *      // You would use this.servletUrlPattern.register in your Servlet's constructor or init
+ *      final ServletUrl servletUrl = this.servletUrlPattern.handle(request, response);
+ *
+ *      if (ServletUrl.NOT_FOUND.equals(servletUrl)) {
+ *          response.sendError(HttpServletResponse.SC_NOT_FOUND);
+ *      }
+ * }
+ * </pre></blockquote>
+ *
+ * When you call {@link #handle(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)} method, your matching
+ * {@code requestHandler} method will be called. If there is no matching url mappings then {@code ServletUrl.NOT_FOUND} is returned.
+ * You should check for {@code ServletUrl.NOT_FOUND} and send {@link javax.servlet.http.HttpServletResponse.SC_NOT_FOUND} manually.
+ *
+ * <hr/>
+ *
+ * <p>When you register url patterns <strong>without</strong> a {@code requestHandler} then you need to manually check to see which pattern is matched with the request
+ * as follows:</p>
+ *
+ * <blockquote><pre>
+ * void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+ *      // Note that it's "ServletUrlPattern" and not "ServletUrlPatternRegistrar"
+ *      // You would use this.servletUrlPattern.register in your Servlet's constructor or init
+ *      ServletUrl servletUrl = this.servletUrlPattern.parse(request);
+ *
+ *      switch (servletUrl.getName()) {
+ *        case "list": {
+ *            // handle request and write to response
+ *            return;
+ *        }
+ *
+ *        // other cases
+ *
+ *        case ServletUrl.NOT_FOUND_404:
+ *            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+ *            return;
+ *
+ *        default:
+ *            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+ *            return;
+ *      }
+ * }
+ * </pre></blockquote>
+ *
  *
  * @author destan
  */
@@ -47,11 +99,11 @@ public class ServletUrlPattern {
 
 	/**
 	 * <p>For a Servlet extending {@link com.kodgemisi.servlet_url_mapping.MappingServlet} you normally should use {@link
-	 * com.kodgemisi.servlet_url_mapping.ServletUrlPatternRegistrar}'s {@code get}, {@code post}, {@code put} etc. methods.</p>
+	 * com.kodgemisi.servlet_url_mapping.ServletUrlPatternRegistrar}'s {@code get}, {@code post}, {@code put} etc. methods.
+	 * However when you want to manually check url mappings, for example in a Servlet Filter, you can use this method.</p>
 	 *
 	 * <p>This method is NOT thread-safe. Should only be called from a {@code constructor} or {@link javax.servlet.http.HttpServlet#init()} or called
-	 * in
-	 * a synchronized block.</p>
+	 * in a synchronized block.</p>
 	 *
 	 * @param name           (optional, maybe null or empty) The name of your choice for this url pattern. This parameter is optional when using this
 	 *                       version of {@code register} method.
@@ -68,11 +120,34 @@ public class ServletUrlPattern {
 			throws IllegalArgumentException {
 
 		// be tolerant :)
-		if (urlPattern.startsWith("/") == false) {
+		if (!urlPattern.startsWith("/")) {
 			urlPattern = '/' + urlPattern;
 		}
 
 		urlMappings.put(new ServletUrl(name, urlPattern, type), requestHandler);
+		return this;
+	}
+
+	/**
+	 * <p>For a Servlet extending {@link com.kodgemisi.servlet_url_mapping.MappingServlet} you normally should use {@link
+	 * com.kodgemisi.servlet_url_mapping.ServletUrlPatternRegistrar}'s {@code get}, {@code post}, {@code put} etc. methods.
+	 * However when you want to manually check url mappings, for example in a Servlet Filter, you can use this method.</p>
+	 *
+	 * <p>This method is NOT thread-safe. Should only be called from a {@code constructor} or {@link javax.servlet.http.HttpServlet#init()} or called
+	 * in a synchronized block.</p>
+	 *
+	 * @param requestHandler A lambda function or function reference which will be used as the handler of matching requests
+	 * @param urlPattern     Similar to Spring's or JAX-RS's url patterns but only supports variables through {@literal { }}
+	 * @param type           optional type information for path variables i.e {@literal { }}. All Path variables considered as {@code Integer} by
+	 *                       default. You
+	 *                       should give types in the same order as you type {@literal { }} expressions in {@code urlPattern}
+	 * @return
+	 * @throws IllegalArgumentException if type is not one of those: {@link String}, {@link java.lang.Number}, {@link java.lang.Boolean}
+	 */
+	public ServletUrlPattern register(String urlPattern, ServletRequestHandler requestHandler, Class<?>... type) {
+		//FIXME check if this really throws IllegalArgumentException, if so add to javadoc, if not remove from overloaded version's javadoc
+
+		this.register("", urlPattern, requestHandler, type);
 		return this;
 	}
 
@@ -156,7 +231,7 @@ public class ServletUrlPattern {
 		}
 		catch (ServletException | IOException e) {
 			// this is expected to never happen
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -190,7 +265,7 @@ public class ServletUrlPattern {
 
 		// make this exception a checked one or find another solution
 		log.trace("URL {} didn't match any registered urls!", url);
-		return ServletUrl.notFound;
+		return ServletUrl.NOT_FOUND;
 	}
 
 	/**
