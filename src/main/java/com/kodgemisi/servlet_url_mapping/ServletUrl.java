@@ -34,7 +34,7 @@ public class ServletUrl {
 	private static Pattern pathVariablePattern = Pattern.compile("\\{[A-Za-z_$]\\w*\\}");
 
 	static {
-		NOT_FOUND = new ServletUrl(NOT_FOUND_404, "<not applicable>", new Class[0]);
+		NOT_FOUND = new ServletUrl(NOT_FOUND_404, "<not applicable>", new Class[0], null);
 	}
 
 	private final String name;
@@ -49,18 +49,20 @@ public class ServletUrl {
 
 	private final Map<String, Object> pathVariables;
 
+	private final ServletRequestHandler requestHandler;
+
 	private int index = 0;
 
 	/**
-	 *
-	 * @param name May be null or empty
+	 * @param name       May be null or empty
 	 * @param urlPattern
 	 * @param types
 	 */
-	ServletUrl(String name, String urlPattern, Class<?>[] types) {
+	ServletUrl(String name, String urlPattern, Class<?>[] types, ServletRequestHandler requestHandler) {
 		this.name = name;
 		this.variableTypes = Collections.unmodifiableList(Arrays.asList(types));
 		this.pathVariables = Collections.emptyMap();// prevent accidental use
+		this.requestHandler = requestHandler;
 
 		List<String> names = new ArrayList<String>();
 		this.pattern = Pattern.compile(urlPatternToRegex(urlPattern, names, variableTypes));
@@ -75,7 +77,8 @@ public class ServletUrl {
 		this.pattern = copy.pattern;
 		this.hasTrailingSlash = copy.hasTrailingSlash;
 		this.variableNames = copy.variableNames;
-		this.pathVariables = new HashMap<String, Object>();
+		this.pathVariables = new HashMap<>();
+		this.requestHandler = copy.requestHandler;
 	}
 
 	private static Object getObjectAs(Class<?> clazz, String value) {
@@ -148,13 +151,23 @@ public class ServletUrl {
 	}
 
 	/**
-	 * The method to use to decide the parsed URL. See {@link ServletUrlPatternRegistrar} for usage details.
+	 * The method to use to decide the parsed URL.
 	 *
-	 * @param name
+	 * @param name cannot be null.
 	 * @return true if the given name matches {@code this.name}
 	 */
 	public boolean is(String name) {
-		return this.name.equals(name);
+		return name.equals(this.name);
+	}
+
+	/**
+	 * The method to use to decide the parsed URL.
+	 *
+	 * @param name cannot be null.
+	 * @return true if the given name doesn't matches {@code this.name}
+	 */
+	public boolean isNot(String name) {
+		return !name.equals(this.name);
 	}
 
 	/**
@@ -170,9 +183,33 @@ public class ServletUrl {
 		return name;
 	}
 
-	@Override
-	public String toString() {
-		return "ServletUrl{" + "uniqueName='" + name + '\'' + ", pathVariables=" + pathVariables + '}';
+	public ServletRequestHandler getRequestHandler() {
+		return requestHandler;
 	}
 
+	@Override
+	public int hashCode() {
+		int result = pattern.hashCode();
+		result = 31 * result + (requestHandler != null ? requestHandler.hashCode() : 0);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		ServletUrl that = (ServletUrl) o;
+
+		if (!pattern.equals(that.pattern))
+			return false;
+		return requestHandler != null ? requestHandler.equals(that.requestHandler) : that.requestHandler == null;
+	}
+
+	@Override
+	public String toString() {
+		return "ServletUrl{" + "name='" + name + '\'' + ", pattern=" + pattern + '}';
+	}
 }

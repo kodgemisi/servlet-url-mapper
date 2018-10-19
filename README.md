@@ -3,7 +3,7 @@
 This small and non-invasive library is intended to be used in servlet-only environments where for some reasons developers are left without any frameworks like Spring MVC or Jax-RS.
 In such servlet-only environments, this library helps to handle nested URL structures in one servlet.
 
-_Non-invasive_: You don't need to use `servlet url mapper` in every servlet, you can use only some of them.
+_Non-invasive_: You don't need to use `servlet url mapper` in every servlet, you can use only in some of them.
 
 Assume you have a `ProductsServlet` with `/products, /products/*` URL mapping. Then you would handle request like follows:
 
@@ -42,28 +42,28 @@ public class MyServlet extends MappingServlet {
 }
 ```
 
-2. Register your url mappings via `protected patternRegistrar` field from `MappingServlet`. You can do this either in `constructor` or in `init` method.
+2. Register your url mappings via `protected urlMappingRegistrar` field from `MappingServlet`. You can do this either in `constructor` or in `init` method.
 
 ```java
 @WebServlet(urlPatterns = {"/products", "/products/"})
 public class MyServlet extends MappingServlet {
   public MyServlet() {
-      this.patternRegistrar
+      this.urlMappingRegistrar
       
              // matches GET request to "host/context-root/products"
-             .get("list", "/", this::list)
+             .get("/", this::list)
 
              // matches GET request to "host/context-root/products/all"
-             .get("all", "/all", this::list) // note that the same method can be used for multiple url mappings
+             .get("/all", this::list) // note that the same method can be used for multiple url mappings
 
              // matches GET request to "host/context-root/products/{id}"
-             .get("show", "/{id}", this::show)
+             .get("/{id}", this::show)
 
              // matches POST request to "host/context-root/products"
-             .post("create", "/", this::create)
+             .post("/", this::create)
 
              // matches POST request to "host/context-root/products/{id}/address"
-             .post("add address", "/{id}/address", AddressHelper::addAddress);
+             .post("/{id}/address", AddressHelper::addAddress);
       // and so on...
   }
 
@@ -100,11 +100,11 @@ You can use [jitpack](https://jitpack.io) to add this library as a dependency fo
 <dependency>
     <groupId>com.github.kodgemisi</groupId>
     <artifactId>servlet-url-mapper</artifactId>
-    <version>v1.0.0-RC1</version>
+    <version>v1.0.0</version>
 </dependency>
 ```
 
-See https://jitpack.io/#kodgemisi/servlet-url-mapper/v1.0.0-RC1
+See https://jitpack.io/#kodgemisi/servlet-url-mapper
 
 ## License and Copyright
 

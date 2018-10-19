@@ -20,6 +20,13 @@ import java.io.IOException;
 @FunctionalInterface
 public interface ServletRequestHandler {
 
-	void handleRequest(HttpServletRequest req, HttpServletResponse resp, ServletUrl servletUrl) throws ServletException, IOException;
+	/**
+	 * @param request
+	 * @param response
+	 * @param servletUrl
+	 * @throws ServletException It may occur during the usage of {@code request.getServletContext().getRequestDispatcher(url).forward(req, resp)}
+	 * @throws IOException      It may occur during the usage of {@code response#sendError}.
+	 */
+	void handleRequest(HttpServletRequest request, HttpServletResponse response, ServletUrl servletUrl) throws ServletException, IOException;
 
 }
