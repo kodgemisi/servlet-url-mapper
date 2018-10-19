@@ -100,7 +100,7 @@ You can use [jitpack](https://jitpack.io) to add this library as a dependency fo
 <dependency>
     <groupId>com.github.kodgemisi</groupId>
     <artifactId>servlet-url-mapper</artifactId>
-    <version>v1.0.0</version>
+    <version>1.0.0</version>
 </dependency>
 ```
 
