@@ -13,8 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.regex.Matcher;
 
 /**
@@ -78,7 +77,7 @@ public class ServletUrlPattern {
 
 	private static final Logger log = LoggerFactory.getLogger(ServletUrlPattern.class);
 
-	private final Set<ServletUrl> urlMappings;
+	private final LinkedHashSet<ServletUrl> urlMappings;
 
 	/**
 	 * <p>Whether to match to URLs irrespective of the presence of a trailing slash. If enabled a method mapped to "/users" also matches to "/users/".</p>
@@ -89,7 +88,7 @@ public class ServletUrlPattern {
 	private boolean useTrailingSlashMatch = true;
 
 	public ServletUrlPattern() {
-		urlMappings = new HashSet<>();
+		urlMappings = new LinkedHashSet<>();
 	}
 
 	public ServletUrlPattern(boolean useTrailingSlashMatch) {
