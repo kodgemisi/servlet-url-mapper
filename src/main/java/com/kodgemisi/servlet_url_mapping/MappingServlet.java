@@ -64,6 +64,11 @@ public class MappingServlet extends HttpServlet {
 	 */
 	protected final ServletUrlPatternRegistrar urlMappingRegistrar;
 
+	/**
+	 * Default is {@link LoggingExceptionHandler}
+	 */
+	protected final ExceptionHandler exceptionHandler;
+
 	public MappingServlet() {
 		this(true);
 	}
@@ -75,70 +80,62 @@ public class MappingServlet extends HttpServlet {
 	 *                              <a href="http://docs.spring.io/spring/docs/5.0.x/javadoc-api/org/springframework/web/servlet/mvc/method/annotation/RequestMappingHandlerMapping.html#setUseTrailingSlashMatch-boolean-">Spring API</a>
 	 */
 	public MappingServlet(boolean useTrailingSlashMatch) {
+		this(new LoggingExceptionHandler(), useTrailingSlashMatch);
+	}
+
+	public MappingServlet(ExceptionHandler exceptionHandler, boolean useTrailingSlashMatch) {
 		this.urlMappingRegistrar = new ServletUrlPatternRegistrar(useTrailingSlashMatch);
+		this.exceptionHandler = exceptionHandler;
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
-
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
+		doCommon(request, response);
 	}
 
 	@Override
 	protected void doHead(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
-
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
+		doCommon(request, response);
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
-
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
+		doCommon(request, response);
 	}
 
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
-
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
+		doCommon(request, response);
 	}
 
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
-
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
+		doCommon(request, response);
 	}
 
 	@Override
 	protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
-
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
+		doCommon(request, response);
 	}
 
 	@Override
 	protected void doTrace(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		final ServletUrl servletUrl = urlMappingRegistrar.handle(request, response);
+		doCommon(request, response);
+	}
 
-		if (servletUrl.is404()) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	private void doCommon(HttpServletRequest request, HttpServletResponse response) {
+		final ServletUrl servletUrl;
+		try {
+			servletUrl = urlMappingRegistrar.handle(request, response);
+
+			if (servletUrl.is404()) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			}
 		}
+		catch (Exception e) {
+			this.exceptionHandler.handleException(request, response, e);
+		}
+
 	}
 
 }
