@@ -39,9 +39,8 @@ import java.util.regex.Matcher;
  * <p>
  * When you call {@link #handle(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)} method, your matching
  * {@code requestHandler} method will be called. If there is no matching url mappings then {@code ServletUrl.NOT_FOUND} is returned.
- * You should check for {@code ServletUrl.NOT_FOUND} and send {@link javax.servlet.http.HttpServletResponse.SC_NOT_FOUND} manually.
+ * You should check for {@code ServletUrl.NOT_FOUND} and send {@link javax.servlet.http.HttpServletResponse#SC_NOT_FOUND} manually.
  * <p>
- * <hr/>
  *
  * <p>When you register url patterns <strong>without</strong> a {@code requestHandler} then you need to manually check to see which pattern is matched with the request
  * as follows:</p>
