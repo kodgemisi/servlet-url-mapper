@@ -1,8 +1,11 @@
 package com.kodgemisi.servlet_url_mapping;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import javax.servlet.ServletException;
@@ -13,12 +16,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 /**
  *
- * We don't verify calls of {@code handleRequest} methods because Mockito can't verify them as they are called via methhod
+ * We don't verify calls of {@code handleRequest} methods because Mockito can't verify them as they are called via method
  * references. Instead we verify the operations in {@code handleRequest} methods.
  *
  * Created on October, 2018
@@ -26,7 +29,7 @@ import static org.mockito.Mockito.when;
  * @author destan
  */
 
-class SimpleMappingTest {
+class SampleServletTest {
 
 	@Mock
 	private HttpServletRequest request;
@@ -35,8 +38,28 @@ class SimpleMappingTest {
 	private HttpServletResponse response;
 
 	@BeforeEach
-	void setUp() throws Exception {
+	void setUp() {
 		MockitoAnnotations.initMocks(this);
+	}
+
+	@Test
+	void exceptionThrowing() {
+
+		final SampleServlet sampleServlet = new SampleServlet(true);
+		Assertions.assertThrows(RuntimeException.class, () -> sampleServlet.doGet(request, response));
+	}
+
+	@Test
+	@DisplayName("Ensure custom exception handler is used")
+	void exceptionHandler() throws IOException, ServletException {
+
+		final StringWriter sw = prepareFor("GET", "/exception");
+
+		final ExceptionHandler exceptionHandler = mock(ExceptionHandler.class);
+		final SampleServlet sampleServlet = new SampleServlet(exceptionHandler, true);
+
+		sampleServlet.doGet(request, response);
+		verify(exceptionHandler, times(1)).handleException(any(), any(), any());
 	}
 
 	@Test
@@ -63,6 +86,45 @@ class SimpleMappingTest {
 		assertEquals( "13", result);
 
 		verify(response).setStatus(HttpServletResponse.SC_OK);
+	}
+
+	@Test
+	void imagesWithTraillingSlash() throws ServletException, IOException {
+		final StringWriter sw = prepareFor("GET", "/products/13/images/35/");
+
+		final SampleServlet sampleServlet = new SampleServlet(true);
+		sampleServlet.doPost(request, response);
+
+		String result = sw.getBuffer().toString().trim();
+		assertEquals( "13 35", result);
+
+		verify(response).setStatus(HttpServletResponse.SC_OK);
+	}
+
+	@Test
+	void toggleDiscountWithTraillingSlash() throws ServletException, IOException {
+		final StringWriter sw = prepareFor("PUT", "/products/13/discounts/true/");
+
+		final SampleServlet sampleServlet = new SampleServlet(true);
+		sampleServlet.doPost(request, response);
+
+		String result = sw.getBuffer().toString().trim();
+		assertEquals( "13 true", result);
+
+		verify(response).setStatus(HttpServletResponse.SC_OK);
+	}
+
+	@Test
+	void makeDiscountWithTraillingSlash() throws ServletException, IOException {
+		final StringWriter sw = prepareFor("POST", "/products/13/discounts/35.5/");
+
+		final SampleServlet sampleServlet = new SampleServlet(true);
+		sampleServlet.doPost(request, response);
+
+		String result = sw.getBuffer().toString().trim();
+		assertEquals( "13 35.5", result);
+
+		verify(response).setStatus(HttpServletResponse.SC_CREATED);
 	}
 
 	@Test

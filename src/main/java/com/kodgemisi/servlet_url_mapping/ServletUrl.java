@@ -6,13 +6,17 @@
 
 package com.kodgemisi.servlet_url_mapping;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * <p>
- * Used to represent a request parsing result.<br>
+ * This class represents a request URL parsing result.<br>
  * i.e {@code ServletUrl servletUrl = servletUrlPattern.parse(request)}<br>
  * i.e {@code ServletUrl servletUrl = servletUrlPatternRegistrar.parse(request)}
  * </p>
@@ -32,6 +36,8 @@ public class ServletUrl {
 	static final ServletUrl NOT_FOUND;
 
 	private static Pattern pathVariablePattern = Pattern.compile("\\{[A-Za-z_$]\\w*\\}");
+
+	static final Class<?> DEFAULT_PATH_VARIABLE_TYPE = String.class;
 
 	static {
 		NOT_FOUND = new ServletUrl(NOT_FOUND_404, "<not applicable>", new Class[0], null);
@@ -58,17 +64,19 @@ public class ServletUrl {
 	 * @param urlPattern
 	 * @param types
 	 */
-	ServletUrl(String name, String urlPattern, Class<?>[] types, ServletRequestHandler requestHandler) {
+	ServletUrl(@Nullable String name, @NotNull String urlPattern, @NotNull Class<?>[] types, ServletRequestHandler requestHandler) {
 		this.name = name;
 		this.variableTypes = Collections.unmodifiableList(Arrays.asList(types));
 		this.pathVariables = Collections.emptyMap();// prevent accidental use
 		this.requestHandler = requestHandler;
 
-		List<String> names = new ArrayList<String>();
+		final List<String> names = new ArrayList<>();
 		this.pattern = Pattern.compile(urlPatternToRegex(urlPattern, names, variableTypes));
 
-		this.hasTrailingSlash = urlPattern.length() > 0 && urlPattern.substring(urlPattern.length() - 1, urlPattern.length()).equals("/");
+		this.hasTrailingSlash = urlPattern.endsWith("/");
 		this.variableNames = Collections.unmodifiableList(names);
+
+		//TODO check if variableNames & variableTypes sizes are consistent (only if variableTypes is not empty)
 	}
 
 	ServletUrl(ServletUrl copy) {
@@ -79,6 +87,7 @@ public class ServletUrl {
 		this.variableNames = copy.variableNames;
 		this.pathVariables = new HashMap<>();
 		this.requestHandler = copy.requestHandler;
+		this.index = copy.index;
 	}
 
 	private static Object getObjectAs(Class<?> clazz, String value) {
@@ -86,10 +95,16 @@ public class ServletUrl {
 		if (String.class.equals(clazz)) {
 			return value;
 		}
-		else if (Number.class.isAssignableFrom(clazz)) {
+		if (Integer.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz)) {
 			return Integer.valueOf(value);
 		}
-		else if (Boolean.class.equals(clazz)) {
+		if (Long.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)) {
+			return Long.valueOf(value);
+		}
+		if (BigDecimal.class.isAssignableFrom(clazz)) {
+			return new BigDecimal(value);
+		}
+		if (Boolean.class.equals(clazz) || boolean.class.equals(clazz)) {
 			return Boolean.valueOf(value);
 		}
 
@@ -97,22 +112,22 @@ public class ServletUrl {
 	}
 
 	/**
-	 * <strong>Caveat</strong> <p>Prefer primitive wrapper classes like Integer, Long etc. to avoid {@link NullPointerException} when the value is
-	 * null.</p> <p>Note that casting {@code null} to {@code int} throws {@link NullPointerException} however casting {@code null} to {@link Integer}
-	 * doesn't!</p>
+	 * <strong>Caveat</strong>
+	 * <p>Prefer primitive wrapper classes like Integer, Long etc. to avoid {@link NullPointerException} when the value might be null.</p>
+	 * <p>Note that casting {@code null} to {@code int} throws {@link NullPointerException} however casting {@code null} to {@link Integer} doesn't!</p>
 	 *
-	 * @param variable
-	 * @param <T>
-	 * @return
+	 * @param variable path variable name
+	 * @return T
 	 */
 	public <T> T variable(String variable) {
-		return (T) pathVariables.get(variable);
+		return (T) pathVariables.get(variable);//TODO return optional
 	}
 
 	void addVariable(String value) {
-		//TODO size validation
 
-		Class<?> clazz = index >= variableTypes.size() ? Integer.class : variableTypes.get(index);//default is Integer
+		// Cannot use simply variableTypes.isEmpty() because user may give only first parameter type out of total two
+		// E.g. servletUrlPattern.register("example", "/users/{id}/addresses/{addrId}", Long.class) here the second parameter is String (the default)
+		final Class<?> clazz = index >= variableTypes.size() ? DEFAULT_PATH_VARIABLE_TYPE : variableTypes.get(index);
 		pathVariables.put(variableNames.get(index++), getObjectAs(clazz, value));
 	}
 
@@ -131,22 +146,27 @@ public class ServletUrl {
 			String variable = matcher.group();
 			names.add(variable.substring(1, variable.length() - 1));// get rid of {}
 
-			Class<?> clazz = names.size() > types.size() ? Integer.class : types.get(names.size() - 1);//default is Integer
+			final Class<?> clazz = names.size() > types.size() ? DEFAULT_PATH_VARIABLE_TYPE : types.get(names.size() - 1);
 			result = result.replace(variable, getRegexGroupByType(clazz));
 		}
 		return result;
 	}
 
 	private String getRegexGroupByType(Class<?> clazz) {
+
 		if (String.class.equals(clazz)) {
-			return "(\\w+)";
+			return "([^/]+)";
 		}
-		if (Number.class.isAssignableFrom(clazz)) {
+		if (Integer.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz) || Long.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)) {
 			return "(\\d+)";
 		}
-		if (Boolean.class.equals(clazz)) {
+		if (BigDecimal.class.isAssignableFrom(clazz)) {
+			return "(\\d+\\.*\\d*)";
+		}
+		if (Boolean.class.equals(clazz) || boolean.class.equals(clazz)) {
 			return "(true|false|True|False|TRUE|FALSE)";
 		}
+
 		throw new IllegalArgumentException("Unsupported Type " + clazz.getName());
 	}
 

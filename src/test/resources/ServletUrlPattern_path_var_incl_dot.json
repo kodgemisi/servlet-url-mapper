@@ -1,0 +1,19 @@
+{
+  "useTrailingSlashMatch": true,
+  "registeredUrls": [
+    {"name": "file", "url": "/files/{name}"},
+    {"name": "image", "url": "/images/{name}", "classes":  ["java.lang.String"]},
+    {"name": "profile pic", "url": "/images/profile.pics/{name}"}
+  ],
+  "testConditions": [
+    {"name": "file", "url": "/files/sample.png", "parameters":  [{"name": "name", "value": "sample.png", "type": "java.lang.String"}]},
+    {"name": "file", "url": "/files/sample.png/", "parameters":  [{"name": "name", "value": "sample.png", "type": "java.lang.String"}]},
+    {"name": "image", "url": "/images/sample.png", "parameters":  [{"name": "name", "value": "sample.png", "type": "java.lang.String"}]},
+    {"name": "image", "url": "/images/sample.png/", "parameters":  [{"name": "name", "value": "sample.png", "type": "java.lang.String"}]},
+    {"name": "profile pic", "url": "/images/profile.pics/sample.png", "parameters":  [{"name": "name", "value": "sample.png", "type": "java.lang.String"}]},
+    {"name": "profile pic", "url": "/images/profile.pics/sample.png/", "parameters":  [{"name": "name", "value": "sample.png", "type": "java.lang.String"}]},
+    {"name": "image", "url": "/images/profile.pics", "parameters":  [{"name": "name", "value": "profile.pics", "type": "java.lang.String"}]},
+    {"name": "image", "url": "/images/profile.pics/", "parameters":  [{"name": "name", "value": "profile.pics", "type": "java.lang.String"}]},
+    {"name": "404_NOT_FOUND", "url": "/image./profile.pics/", "parameters":  [{"name": "name", "value": "profile.pics", "type": "java.lang.String"}]}
+  ]
+}

@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * <p>Servlets extending {@link MappingServlet} provide methods matching {@link ServletRequestHandler#handleRequest} signature so that those methods
- * can be used as request handlers.</p> <p>See {@link ServletUrlPatternRegistrar} for examples.</p>
+ * <p>Servlets extending {@link MappingServlet} should provide methods matching {@link ServletRequestHandler#handleRequest} signature so that those methods
+ * can be used as request handlers.</p> <p>See {@link ServletUrlPattern} for examples.</p>
  *
  * @author destan
  */

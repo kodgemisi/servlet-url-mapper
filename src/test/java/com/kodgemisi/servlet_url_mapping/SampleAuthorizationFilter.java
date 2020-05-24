@@ -25,24 +25,23 @@ class SampleAuthorizationFilter implements Filter {
 	}
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-
+	public void init(FilterConfig filterConfig) {
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		final ServletUrl result = servletUrlPattern.parse((HttpServletRequest) request);
 		switch (result.getName()) {
-		case "admin":
-			if(!isCurrentUserAdmin()) {
-				((HttpServletResponse)response).sendError(HttpServletResponse.SC_FORBIDDEN);
-				return;
-			}
-			break;
+			case "admin":
+				if (!isCurrentUserAdmin()) {
+					((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+					return;
+				}
+				break;
 
-		case "logout":
-			preLogoutWork();
-			break;
+			case "logout":
+				preLogoutWork();
+				break;
 		}
 
 		chain.doFilter(request, response);

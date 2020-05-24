@@ -1,0 +1,25 @@
+{
+  "useTrailingSlashMatch": true,
+  "registeredUrls": [
+    {"name": "list", "url": "/users"},
+    {"name": "create", "url": "/users/new"},
+    {"name": "addresses", "url": "/users/{id}/addresses", "classes":  ["java.lang.Integer"]},
+    {"name": "address details", "url": "/users/{id}/addresses/{addrId}", "classes":  ["java.lang.Integer"]},
+    {"name": "details", "url": "/users/{id}", "classes":  ["java.lang.Integer"]},
+    {"name": "details collapsed", "url": "/users/{id}?collapsed={isCollapsed}", "classes":  ["java.lang.String", "java.lang.Boolean"]}
+  ],
+  "testConditions": [
+    {"name": "404_NOT_FOUND", "url": "/user"},
+    {"name": "list", "url": "/users"},
+    {"name": "list", "url": "/users/"},
+    {"name": "create", "url": "/users/new"},
+    {"name": "create", "url": "/users/new/"},
+    {"name": "create", "url": "/users/new?some=query"},
+    {"name": "create", "url": "/users/new/?some=query"},
+    {"name": "addresses", "url": "/users/13/addresses", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Integer"}]},
+    {"name": "addresses", "url": "/users/13/addresses/", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Integer"}]},
+    {"name": "address details", "url": "/users/13/addresses/7", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Integer"}, {"name": "addrId", "value": "7", "type": "java.lang.String"}]},
+    {"name": "details", "url": "/users/13", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Integer"}]},
+    {"name": "details", "url": "/users/13?collapsed=true", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Integer"}]}
+  ]
+}

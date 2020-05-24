@@ -1,0 +1,10 @@
+{
+  "useTrailingSlashMatch": true,
+  "registeredUrls": [
+    {"name": "details", "url": "/discounts/{enabled}", "classes":  ["java.lang.Boolean"]}
+  ],
+  "testConditions": [
+    {"name": "details", "url": "/discounts/true", "parameters":  [{"name": "enabled", "value": "true", "type": "java.lang.Boolean"}]},
+    {"name": "details", "url": "/discounts/false/", "parameters":  [{"name": "enabled", "value": "false", "type": "java.lang.Boolean"}]}
+  ]
+}
