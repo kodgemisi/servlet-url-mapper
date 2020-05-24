@@ -1,3 +1,5 @@
+[![Release](https://jitpack.io/v/kodgemisi/servlet-url-mapper.svg)](https://jitpack.io/#kodgemisi/servlet-url-mapper)
+
 # Servlet Url Mapper
 
 This small and non-invasive library is intended to be used in servlet-only environments where for some reasons developers are forced to use 
