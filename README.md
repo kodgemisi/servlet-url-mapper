@@ -1,4 +1,6 @@
 [![Release](https://jitpack.io/v/kodgemisi/servlet-url-mapper.svg)](https://jitpack.io/#kodgemisi/servlet-url-mapper)
+[![CircleCI](https://circleci.com/gh/kodgemisi/servlet-url-mapper.svg?style=shield)](https://circleci.com/gh/kodgemisi/servlet-url-mapper)
+
 
 # Servlet Url Mapper
 
