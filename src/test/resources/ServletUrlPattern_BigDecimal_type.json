@@ -1,0 +1,10 @@
+{
+  "useTrailingSlashMatch": true,
+  "registeredUrls": [
+    {"name": "details", "url": "/discounts/{amount}", "classes":  ["java.math.BigDecimal"]}
+  ],
+  "testConditions": [
+    {"name": "details", "url": "/discounts/35.5", "parameters":  [{"name": "amount", "value": "35.5", "type": "java.math.BigDecimal"}]},
+    {"name": "details", "url": "/discounts/35.5/", "parameters":  [{"name": "amount", "value": "35.5", "type": "java.math.BigDecimal"}]}
+  ]
+}

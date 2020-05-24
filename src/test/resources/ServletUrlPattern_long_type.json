@@ -1,0 +1,10 @@
+{
+  "useTrailingSlashMatch": true,
+  "registeredUrls": [
+    {"name": "details", "url": "/users/{id}", "classes":  ["java.lang.Long"]}
+  ],
+  "testConditions": [
+    {"name": "details", "url": "/users/13", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Long"}]},
+    {"name": "details", "url": "/users/13/", "parameters":  [{"name": "id", "value": "13", "type": "java.lang.Long"}]}
+  ]
+}
